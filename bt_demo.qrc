@@ -1,0 +1,28 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>images/device-paired.png</file>
+    <file>images/device-unpaired.png</file>
+    <file>images/audio-card.png</file>
+    <file>images/camera-photo.png</file>
+    <file>images/camera-video.png</file>
+    <file>images/computer.png</file>
+    <file>images/input-gaming.png</file>
+    <file>images/input-keyboard.png</file>
+    <file>images/input-mouse.png</file>
+    <file>images/input-tablet.png</file>
+    <file>images/modem.png</file>
+    <file>images/network-wireless.png</file>
+    <file>images/phone.png</file>
+    <file>images/printer.png</file>
+    <file>images/media-playback-pause.png</file>
+    <file>images/media-playback-start.png</file>
+    <file>images/media-playback-stop.png</file>
+    <file>images/logo_texas.png</file>
+    <file>images/logo_pf.png</file>
+    <file>images/lock.png</file>
+    <file>images/go-down.png</file>
+    <file>images/go-up.png</file>
+    <file>images/go-next.png</file>
+    <file>images/go-previous.png</file>
+</qresource>
+</RCC>

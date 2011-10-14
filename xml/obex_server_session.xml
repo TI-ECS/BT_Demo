@@ -1,0 +1,40 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="org.openobex.ServerSession">
+    <method name="Cancel">
+    </method>
+    <method name="Reject">
+    </method>
+    <method name="Accept">
+    </method>
+    <method name="GetTransferInfo">
+      <arg name="arg0" type="a{ss}" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="QStringMap"/>
+    </method>
+    <method name="Disconnect">
+    </method>
+    <signal name="RemoteDisplayRequested">
+      <arg type="s"/>
+    </signal>
+    <signal name="ErrorOccurred">
+      <arg type="s"/>
+      <arg type="s"/>
+    </signal>
+    <signal name="TransferCompleted">
+    </signal>
+    <signal name="TransferProgress">
+      <arg type="t"/>
+    </signal>
+    <signal name="TransferStarted">
+      <arg type="s"/>
+      <arg type="s"/>
+      <arg type="t"/>
+    </signal>
+    <signal name="Disconnected">
+    </signal>
+    <signal name="Cancelled">
+    </signal>
+  </interface>
+</node>
+

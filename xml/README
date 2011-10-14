@@ -1,0 +1,6 @@
+XML files created with qdbus tool.
+
+Example:
+$ qdbus --system org.bluez / org.freedesktop.DBus.Introspectable.Introspect > manager.xml
+
+Docs for bluez api on doc/ on bluez repository.

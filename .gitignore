@@ -1,0 +1,11 @@
+BT_Demo
+BT_Demo_debug
+Makefile
+Makefile.Release
+Makefile.Debug
+
+#qt_noise
+mocs/*
+objects/*
+ui_*
+qrc_bt_demo.cpp

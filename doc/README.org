@@ -1,0 +1,277 @@
+* Introduction
+
+  The BT\_Demo is an application written in Qt designed to test
+  some Bluetooth capabilities on TI boards. The main features
+  are:
+
+  - Scanning and showing Bluetooth devices and their capabilities.
+  - Send and receives files using Bluetooth.
+  - Streaming audio for Bluetooth devices (speakers, headphones, ...)
+  - To test Bluetooth keyboards and mices.
+
+  The other technologies used in this application are: BlueZ, obex-data-server
+  and dbus.
+
+* Dependencies:
+
+** Qt (>= 4.6.3 ti-sdk-am181x-evm-4.0.1.0)
+
+** BlueZ (>= 4.84 ti-sdk-am181x-evm-4.0.1.0)
+
+** obex-data-server (http://wiki.muiline.com/obex-data-server)
+    - Used for the files transfer.
+    - Using this lib instead use obex-client + obexd  because of all
+      the dependencies of this lib already are in the sdk.
+      The first version of the demo was using the obex-client + obexd,
+      an old version of them. The obex-client needs libraries that are not
+      in the sdk, besides this advantage, using obex-data-server the code of
+      Bluetooth-demo became shorter and easier to understand.
+*** Building
+    - Download [[%20http://tadas.dailyda.com/software/obex-data-server-0.4.6.tar.gz][obex-data-server]]
+      #+BEGIN_SRC emacs-lisp
+      wget http://tadas.dailyda.com/software/obex-data-server-0.4.6.tar.gz
+      #+END_SRC
+    - Extract and configure
+      #+BEGIN_SRC emacs-lisp
+       tar -zxvf ~/obex-data-server-0.4.6.tar.gz
+       ./configure --host=arm -enable-bip=no --prefix=~/obex
+      #+END_SRC
+    - Build
+      #+BEGIN_SRC emacs-lisp
+       make
+      #+END_SRC
+       If the build fails, probably it is beacuse of undefined references. libusb.so depends of
+       libusb-1.0.so.0. Apparently the pkg-config file of libusb should have this deppendency.
+       The solution for this problem is pretty simple, open the Makefile and edit the line
+       which starts with src\_obex\_data\_server\_LDADD adding -lusb-1.0 after -lusb.
+      #+BEGIN_SRC emacs-lisp
+       make install
+      #+END_SRC
+       Now, you just copy the files installed in the path previously set ~/obex/* to the rootfs.
+
+    - To finish the installation of the obex-data-server you have to copy the libdbus-glib-1.* from
+      the sdk to the rootfs (/usr/lib)
+
+
+* Building the Bluetooth demo.
+
+  All that you need to build the demo is:
+  #+BEGIN_SRC emacs-lisp
+  qmake && make release && make install
+  #+END_SRC
+
+  #+BEGIN_SRC emacs-lisp
+  cp -r tmp/* rootfs/
+  #+END_SRC
+
+  You can also to set other install directory, for do that:
+  #+BEGIN_SRC emacs-lisp
+  INSTALLDIR=/path/to/rootfs/ qmake && make release && make install
+  #+END_SRC
+
+  or
+
+  #+BEGIN_SRC emacs-lisp
+  export INSTALLDIR=/path/to/rootfs/
+  qmake && make release && make install
+  #+END_SRC
+
+  This demo uses two scripts, one to init (and to configure) the
+  Bluetooth and other to shutdown. These scripts are made for
+  the am1808 board, if you need run it in other target change them
+  (mainly the part wich loads the Bluetooth driver). Both scritps are
+  copied to the same place of the application.
+
+  To add this application to matrix launcher, it's necessary add the
+  felow lines in */usr/share/matrix/html/menu\_main\_2.html* or
+  */usr/share/matrix/html/menu\_main\_1.html*:
+
+  #+BEGIN_SRC html
+  <div class="object">
+    <object type="application/x-matrix" >
+      <param name="iconName" value="/path/to/some/icon.png"
+      <param name="appName" value="/usr/bin/BT_Demo" />
+      <param name="appText" value="Disable" />
+    </object>
+    <div class="desc">Bluetooth</div>
+  </div>
+  #+END_SRC
+
+** Important
+   There are three generated Makefiles (Makefile, Makefile.Release and Makefile.Debug).
+   If is typed *make* or *make release* is generated  BT\_Demo. To build the debug version
+   just type *make debug*.
+
+   The BT\_Demo\_debug is compiled with debug flags and prepared to run on the build machine,
+   it doesn't uses the init and exit scripts and it's not fullscreen.
+
+
+* Using the demo
+
+** The main view
+
+   When you start the BT\_Demo for the very first time, the application
+   should looks like the image below.
+   #+CAPTION: The BT_Demo running for the first time.
+   #+LABEL:   fig:The main view.
+   [[./imgs/main_view.png]]
+
+   After the application is launched it automatically starts scanning for
+   Bluetooth devices. When it receives the signal DeviceFound (from BlueZ)
+   the device is appended into the list, but this signal not send all information
+   of the device at the first moment, like name. So initially the device is
+   shown using just the address and as soon as it receives the other
+   informations, the item in the list is updated, as you can see in the next image.
+   #+CAPTION: BT_Demo showing some devices.
+   #+LABEL:   fig:The main view with devices.
+   [[./imgs/main_view2.png]]
+
+   In the image below the parts that compose the view are enumerated.
+   #+CAPTION: Important parts of the view.
+   #+LABEL:   fig:The main view details.
+   [[./imgs/main_view_details.png]]
+
+   - 1 - An icon showing the kind of the device (input, audio, cell phone, ...).
+   - 2 - The profiles implemented by the device.
+   - 3 - This icon indicates if the device is paired (green) or not (red).
+   - 4 - A device not paired.
+   - 5 - This button has two functions, star or stop the scan for devices. When the
+         label is showing "Stop scan" means the application is scanning (the scan time
+         is 60 seconds, after this the application stops scanning and the label is
+         changed) and if it is clicked the scanning is stopped instantelly.
+   - 6 - Start listen SPP.
+   - 7 - Quit the application without killing Bluetoothd and remove the Bluetooth driver.
+   - 8 - Quit killing the Bluetoothd and removing the device driver.
+
+*** Important thing to consider in this view
+
+    Once a device has been paired it always appears as soon as the application is launched,
+    it happens because the device is known by the Bluetooth adapter (it can easily be checked
+    in /var/lib/Bluetooth/<adpater\_address>/*). This is expected behaviour and can be verified
+    in other Bluetooth applications as well (gnome-Bluetooth, blueman, ...).
+
+** Pairing a device
+
+   When a device which is not paired (the right icon with red) is clicked the images
+   below should appear.
+
+   #+CAPTION: Pairing.
+   #+LABEL:   fig:The pairing view.
+   [[./imgs/pairing_view.png]]
+
+   #+CAPTION: Requesting the pin code.
+   #+LABEL:   fig:The pairing view keyboard.
+   [[./imgs/pairing_view_keyboard.png]]
+
+   After the device has been paired, the application returns to main view.
+
+** The device view
+
+   When a paired device is clicked the application should looks like the
+   next image.
+
+   #+CAPTION: The device tests view.
+   #+LABEL:   fig:The device view.
+   [[./imgs/device_view.png]]
+
+   Just the tests which can be handled by the device are enabled. For
+   all devices the three last buttons are enabled.
+
+** Sending and receiving files
+
+   These profiles (FTP and OPP) define the requirements for the protocols and procedures
+   that shall be used by the applications providing the file (or objects)
+   transfer usage model.
+
+   Below there are few screenshots covering all possibilities.
+
+   #+CAPTION: Requesting to send a file.
+   #+LABEL:   fig:The send view.
+   [[./imgs/send_view.png]]
+
+   #+CAPTION: A transfer finished.
+   #+LABEL:   fig:Transfer finished.
+   [[./imgs/send_view_finished.png]]
+
+   #+CAPTION: Receiving a file.
+   #+LABEL:   fig:The receive view.
+   [[./imgs/receiving_view.png]]
+
+   The BT\_Demo is able to receive files just in the main view,
+   if it is in other view, automatically the request is rejected.
+
+*** Important
+    When a file is sent using ftp it goes to directory "/", so
+    make sure that this directory has write persmissions.
+
+*** Requisites
+    A device compatible with the OPP or/and FTP profile.
+
+
+** The HID view
+
+   Provides support for devices such as mice, joysticks, keyboards.
+   Bluetooth HID is a lightweight wrapper of the Human Interface
+   Device protocol defined for USB. The use of the HID protocol
+   simplifies host implementation by enabling the re-use of some
+   of the existing support for USB HID to also support Bluetooth HID.
+
+   The HID test should looks like the image below.
+   #+CAPTION: HID test view.
+   #+LABEL:   fig:The hid view.
+   [[./imgs/hid_view.png]]
+
+   It's important to say that there is a well known bug with this
+   profile in the kernel. Once a HID device has been disconnected
+   it cannot be used anymore.
+
+*** Requisites
+    It's necessary a keyboard or mice Bluetooth compatible to test.
+
+** The audio view
+
+   The Advanced Audio Distribution Profile (A2DP) is a Bluetooth profile
+   that allows for the wireless transmission of stereo audio from
+   an A2DP source (typically a phone or computer) to an A2DP receiver
+   (a set of Bluetooth headphones or stereo system).
+
+   The A2DP test should looks like the image below.
+   #+CAPTION: A2DP test view.
+   #+LABEL:   fig:The a2dp view.
+   [[./imgs/a2dp_view.png]]
+
+   Just select a wav file (this is only kind of file enabled) and then
+   click in the play button, the audio then will start to play on device.
+   To stop the audio, just click the stop or done button.
+
+   - This test can play only wav files.
+
+*** Requisites
+    A compatible Bluetooth headphone or stereo system device.
+
+** The SPP view
+
+   This profile emulates a serial cable to provide a simple substitute for existing
+   RS-232, including the familiar control signals.
+   The SPP test is pretty simple, it is a application to send and receive
+   messages. When you click on it, you will wait that other device connect and
+   send messages for you (when you are the listener, you just receive,
+   you cannot send any message).
+
+   The SPP test should looks like the image below.
+   #+CAPTION: SPP test view.
+   #+LABEL:   fig:The SPP view.
+   [[./imgs/spp_view.png]]
+
+   The next image shows the test between a board and a desktop.
+   #+CAPTION: SPP test desktop side.
+   #+LABEL:   fig:The SPP view desktop.
+   [[./imgs/spp_view_desktop.png]]
+
+   #+CAPTION: SPP test board side.
+   #+LABEL:   fig:The SPP view board.
+   [[./imgs/spp_view_remote.png]]
+
+*** Requisites
+    There are necessary two compatible devices, one to be the listener and other
+    to sender.
