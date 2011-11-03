@@ -18,14 +18,38 @@
 
 #include "HIDTest.h"
 
+#include <QWSServer>
+
+#define MOUSE_VAR "QWS_MOUSE_PROTO"
+
 using namespace org::bluez;
 
 static QString HID_CONNECTED = "org.bluez.Error.AlreadyConnected";
+
+static const QStringList getInputDevices()
+{
+    QDir dir;
+    QStringList inputs;
+
+    dir = QDir("/dev/input/");
+    if (!dir.exists()) {
+        qCritical() << "can't open /dev/input/";
+        return QStringList();
+    }
+
+    foreach(QString input, dir.entryList(QDir::AllEntries | QDir::System)) {
+        if (input.startsWith("event", Qt::CaseInsensitive))
+            inputs << QString("USB:/dev/input/" + input);
+    }
+
+    return inputs;
+}
 
 HIDTest::HIDTest(QWidget *parent)
     :QWidget(parent)
 {
     setupUi(this);
+    defaultMouse = QString(qgetenv(MOUSE_VAR));
 
     hid = NULL;
 }
@@ -38,6 +62,7 @@ HIDTest::~HIDTest()
 
 void HIDTest::initTest(DeviceItem *device)
 {
+    isMouse = (device->icon() == "input-mouse") ? true : false;
     text_hid->clear();
     text_hid->setFocus(Qt::OtherFocusReason);
     hid = new Input(BLUEZ_SERVICE_NAME,
@@ -57,6 +82,12 @@ void HIDTest::done()
     delete hid;
     hid = NULL;
 
+    qputenv(MOUSE_VAR, defaultMouse.toAscii());
+
+    QWSServer * server = QWSServer::instance();
+    if (server)
+        server->openMouse();
+
     emit testFinished();
 }
 
@@ -66,14 +97,27 @@ void HIDTest::connectResult(QDBusPendingCallWatcher *watcher)
 
     QDBusPendingReply<> reply = *watcher;
     if (!reply.isValid()) {
-        if (reply.isError() && reply.error().name() == HID_CONNECTED) {
-            emit deviceReady(true);
+        if (reply.isError() && reply.error().name() != HID_CONNECTED) {
+            delete hid;
+            hid = NULL;
+            emit deviceReady(false);
             return;
         }
+    }
 
-        delete hid;
-        hid = NULL;
-        emit deviceReady(false);
-    } else
-        emit deviceReady(true);
+    if (isMouse) {
+        sleep(2);
+        QByteArray value = QByteArray(defaultMouse.toAscii());
+        foreach(QString input, getInputDevices()) {
+            value.append(" ");
+            value.append(input.toAscii());
+        }
+
+        qputenv(MOUSE_VAR, value);
+        QWSServer * server = QWSServer::instance();
+        if (server)
+            server->openMouse();
+    }
+
+    emit deviceReady(true);
 }

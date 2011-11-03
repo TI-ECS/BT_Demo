@@ -48,6 +48,8 @@ signals:
 
 private:
 
+    QString defaultMouse;
+    bool isMouse;
     org::bluez::Input *hid;
 };
 
