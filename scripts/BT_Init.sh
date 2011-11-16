@@ -14,5 +14,3 @@ hciattach /dev/ttyS1 texas 2000000 &
 sleep 10
 hciconfig hci0 piscan &> /dev/null
 agent --path /org/bluez/agent 0000 &> /dev/null &
-sleep 2
-/usr/bin/obex-data-server --no-daemon &

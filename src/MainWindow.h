@@ -47,7 +47,6 @@
 #include "HIDTest.h"
 #include "Keyboard.h"
 #include "LoadingWidget.h"
-#include "ObexTest.h"
 #include "SPPTest.h"
 #include "adapter.h"
 #include "agent.h"
@@ -81,7 +80,6 @@ private slots:
     void deviceRemoved(const QDBusObjectPath &device);
     void getAdapterProperties(QDBusPendingCallWatcher *watcher);
     void listenSPP();
-    void newIncomingTransfer(const QString &fileName, qulonglong size);
     void processFails(QProcess::ProcessError error);
     void quit();
     void quitBT();
@@ -92,9 +90,7 @@ private slots:
     void startFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void stopDiscovering();
     void testA2DP();
-    void testFTP();
     void testHID();
-    void testOPP();
     void testSPP();
     void trustDevice();
     void trustedChanged(QDBusPendingCallWatcher *watcher);

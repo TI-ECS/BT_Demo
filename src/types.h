@@ -55,10 +55,6 @@
 
 static QString BLUEZ_SERVICE_NAME("org.bluez");
 static QString BLUEZ_MANAGER_PATH("/");
-static QString OPENOBEX_SERVICE_NAME("org.openobex");
-static QString OPENOBEX_SERVICE_NAME_CLIENT("org.openobex.client");
-static QString OPENOBEX_SERVICE_NAME_SERVER("org.openobex.Server");
-static QString OPENOBEX_MANAGER_PATH("/");
 
 typedef QMap<uint, QString> ServiceMap;
 Q_DECLARE_METATYPE(ServiceMap)

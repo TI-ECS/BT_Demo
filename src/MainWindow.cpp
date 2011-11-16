@@ -199,28 +199,6 @@ void MainWindow::testHID()
     currentTestPage = page_hid;
 }
 
-void MainWindow::testOPP()
-{
-    if (!currentDeviceItem) {
-        showMainPage();
-        return;
-    }
-
-    if (obex->sendFile(currentDeviceItem->address(), "opp"))
-        stackedWidget->setCurrentWidget(page_progress);
-}
-
-void MainWindow::testFTP()
-{
-    if (!currentDeviceItem) {
-        showMainPage();
-        return;
-    }
-
-    if (obex->sendFile(currentDeviceItem->address(), "ftp"))
-        stackedWidget->setCurrentWidget(page_progress);
-}
-
 void MainWindow::stopDiscovering()
 {
     disconnect(adapter, SIGNAL(DeviceFound(const QString&, const QVariantMap&)),
@@ -258,18 +236,12 @@ void MainWindow::showDevice(QModelIndex index)
     bool paired = props.value("Paired").toBool();
 
     if (paired) {
-        bt_opp->setEnabled(false);
-        bt_ftp->setEnabled(false);
         bt_hid->setEnabled(false);
         bt_a2dp->setEnabled(false);
         bt_spp->setEnabled(false);
 
         foreach (const QVariant &str, props.value("UUIDs").toList()) {
-            if (str.toString() == "00001105-0000-1000-8000-00805f9b34fb")
-                bt_opp->setEnabled(true);
-            else if (str.toString() == "00001106-0000-1000-8000-00805f9b34fb")
-                bt_ftp->setEnabled(true);
-            else if (str.toString() == "00001124-0000-1000-8000-00805f9b34fb")
+            if (str.toString() == "00001124-0000-1000-8000-00805f9b34fb")
                 bt_hid->setEnabled(true);
             else if (str.toString() == "0000110b-0000-1000-8000-00805f9b34fb")
                 bt_a2dp->setEnabled(true);
@@ -483,7 +455,6 @@ void MainWindow::startFinished(int exitCode, QProcess::ExitStatus exitStatus)
     adapter->RegisterAgent(QDBusObjectPath(PAIRING_AGENT_PATH),
                            "DisplayYesNo");
 
-    obex->start();
     timer = new QTimer(this);
     timer->setInterval(SCAN_TIMEOUT);
     timer->setSingleShot(true);
@@ -493,9 +464,6 @@ void MainWindow::startFinished(int exitCode, QProcess::ExitStatus exitStatus)
     scanDevices();
 
     bt_listen_spp->setEnabled(true);
-
-    connect(obex, SIGNAL(incomingTransfer(const QString&, qulonglong)),
-            this, SLOT(newIncomingTransfer(const QString&, qulonglong)));
     loading.stop();
 }
 
@@ -528,24 +496,4 @@ void MainWindow::startA2DPTest()
 {
     a2dp->initTest(currentDeviceItem);
     currentTestPage = page_a2dp;
-}
-
-void MainWindow::newIncomingTransfer(const QString &fileName, qulonglong size)
-{
-    if (stackedWidget->currentIndex()) {
-        obex->acceptTransfer(false);
-        return;
-    }
-
-    int ret = QMessageBox::question(this, tr("Transfer incoming ..."),
-                                    QString("File: %1\nSize: %2Kb").
-                                            arg(fileName).arg(size/1000),
-                                    QMessageBox::Cancel,
-                                    QMessageBox::Save);
-
-    if (ret == QMessageBox::Save) {
-        obex->acceptTransfer(true);
-        stackedWidget->setCurrentWidget(page_progress);
-    } else
-        obex->acceptTransfer(false);
 }
