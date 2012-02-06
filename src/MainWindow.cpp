@@ -224,6 +224,11 @@ void MainWindow::scanDevices()
     timer->start();
 }
 
+void MainWindow::testSINK()
+{
+    // TODO: start the sink test
+}
+
 void MainWindow::showDevice(QModelIndex index)
 {
     DeviceItem *device = index.data(Qt::UserRole).value<DeviceItem*>();
@@ -238,6 +243,7 @@ void MainWindow::showDevice(QModelIndex index)
     if (paired) {
         bt_hid->setEnabled(false);
         bt_a2dp->setEnabled(false);
+        bt_sink->setEnabled(false);
         bt_spp->setEnabled(false);
 
         foreach (const QVariant &str, props.value("UUIDs").toList()) {

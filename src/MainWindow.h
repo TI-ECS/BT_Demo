@@ -47,6 +47,7 @@
 #include "HIDTest.h"
 #include "Keyboard.h"
 #include "LoadingWidget.h"
+#include "SINKTest.h"
 #include "SPPTest.h"
 #include "adapter.h"
 #include "agent.h"
@@ -91,6 +92,7 @@ private slots:
     void stopDiscovering();
     void testA2DP();
     void testHID();
+    void testSINK();
     void testSPP();
     void trustDevice();
     void trustedChanged(QDBusPendingCallWatcher *watcher);

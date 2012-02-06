@@ -33,6 +33,7 @@ INSTALLS += scripts target
 # Input
 HEADERS += device.h \
     A2DPTest.h\
+    SINKTest.h \
     DeviceItem.h \
     DevicesListDelegate.h \
     DevicesListModel.h \
@@ -55,12 +56,14 @@ HEADERS += device.h \
 
 FORMS += ui/MainWindow.ui \
     ui/A2DPTest.ui \
+    ui/SINKTest.ui \
     ui/HIDTest.ui \
     ui/Keyboard.ui \
     ui/SPPTest.ui
 
 SOURCES += main.cpp\
     A2DPTest.cpp\
+    SINKTest.cpp\
     device.cpp \
     DeviceItem.cpp \
     DevicesListDelegate.cpp \

@@ -47,7 +47,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page_main">
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -191,6 +191,13 @@ Pairing remote device...</string>
         <widget class="QPushButton" name="bt_hid">
          <property name="text">
           <string>HID Test</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="bt_sink">
+         <property name="text">
+          <string>SINK Test</string>
          </property>
         </widget>
        </item>
@@ -378,8 +385,8 @@ Pairing remote device...</string>
    <slot>testHID()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>126</x>
-     <y>165</y>
+     <x>144</x>
+     <y>158</y>
     </hint>
     <hint type="destinationlabel">
      <x>539</x>
@@ -394,8 +401,8 @@ Pairing remote device...</string>
    <slot>cancelPair()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>127</x>
-     <y>198</y>
+     <x>146</x>
+     <y>192</y>
     </hint>
     <hint type="destinationlabel">
      <x>543</x>
@@ -410,8 +417,8 @@ Pairing remote device...</string>
    <slot>showMainPage()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>127</x>
-     <y>233</y>
+     <x>146</x>
+     <y>222</y>
     </hint>
     <hint type="destinationlabel">
      <x>544</x>
@@ -602,12 +609,28 @@ Pairing remote device...</string>
    <slot>testOPP()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>360</x>
-     <y>102</y>
+     <x>378</x>
+     <y>98</y>
     </hint>
     <hint type="destinationlabel">
      <x>539</x>
      <y>168</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bt_sink</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>testSINK()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>237</x>
+     <y>180</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>7</x>
+     <y>181</y>
     </hint>
    </hints>
   </connection>
@@ -636,5 +659,6 @@ Pairing remote device...</string>
   <slot>listenSPP()</slot>
   <slot>trustDevice()</slot>
   <slot>readyToTest(bool)</slot>
+  <slot>testSINK()</slot>
  </slots>
 </ui>
