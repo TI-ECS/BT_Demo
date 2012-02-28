@@ -1,0 +1,34 @@
+-include ../../Rules.make
+
+ENV_SETUP ?= ../../linux-devkit/environment-setup
+DESTDIR ?=
+PLATFORM ?=
+PLATFORM_DEFINE ?= "Platform_${PLATFORM}"
+
+all: debug release
+
+qmake: bt_demo.pro
+	@. ${ENV_SETUP}; \
+	qmake2 CONFIG+=debug_and_release QMAKE_CXXFLAGS_DEBUG+=-D${PLATFORM_DEFINE} QMAKE_CXXFLAGS_RELEASE+=-D${PLATFORM_DEFINE} $^
+
+debug: qmake
+	@. ${ENV_SETUP}; \
+	make -f Makefile debug
+
+release: qmake
+	@. ${ENV_SETUP}; \
+	make -f Makefile release
+
+clean: qmake
+	@. ${ENV_SETUP}; \
+	make -f Makefile distclean
+
+install: release
+	@. ${ENV_SETUP}
+	@make -f Makefile install DESTDIR=${DESTDIR}
+	@echo "bt_demo release version installed."
+
+install_debug: debug
+	@. ${ENV_SETUP}
+	@make -f Makefile install DESTDIR=${DESTDIR}
+	@echo "bt_demo release version installed."
