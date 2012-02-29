@@ -195,16 +195,16 @@ Pairing remote device...</string>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="bt_sink">
+        <widget class="QPushButton" name="bt_a2dp">
          <property name="text">
-          <string>SINK Test</string>
+          <string>A2DP Test</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="bt_a2dp">
+        <widget class="QPushButton" name="bt_sink">
          <property name="text">
-          <string>A2DP Test</string>
+          <string>A2DP Sink Test</string>
          </property>
         </widget>
        </item>
@@ -274,6 +274,13 @@ Pairing remote device...</string>
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="page_a2dp_sink">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="SINKTest" name="a2dp_sink" native="true"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -308,6 +315,12 @@ Pairing remote device...</string>
    <slots>
     <signal>testFinished()</signal>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>SINKTest</class>
+   <extends>QWidget</extends>
+   <header>SINKTest.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
