@@ -52,7 +52,7 @@ static service_name services[] = {
     { QString("00001105-0000-1000-8000-00805f9b34fb"), QString("OPP") },
     { QString("00001106-0000-1000-8000-00805f9b34fb"), QString("FTP") },
     { QString("0000110b-0000-1000-8000-00805f9b34fb"),
-      QString("A2DP Audio Sink") },
+      QString("A2DP Sink") },
     { QString("00001124-0000-1000-8000-00805f9b34fb"),
       QString("Human Interface Device (HID)") }
 };
