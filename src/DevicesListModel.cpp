@@ -70,9 +70,7 @@ QVariant DevicesListModel::data(const QModelIndex &index,
     if (role == Qt::DisplayRole) {
         DeviceItem *it =  devicesList.at(index.row());
 
-        QString properties;
-        foreach (QString aux, it->properties())
-            properties.append(QString("%1 ").arg(aux));
+        QString properties = it->properties().join(" / ");
 
         QStringList list;
         list << it->name() << it->name() << it->address() << properties;
