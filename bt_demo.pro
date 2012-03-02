@@ -43,6 +43,7 @@ HEADERS += device.h \
     MainWindow.h \
     adapter.h \
     audiosink.h \
+    audiosource.h \
     manager.h \
     types.h \
     agent_adaptor.h \
@@ -74,6 +75,7 @@ SOURCES += main.cpp\
     MainWindow.cpp \
     adapter.cpp \
     audiosink.cpp \
+    audiosource.cpp \
     manager.cpp \
     agent_adaptor.cpp \
     agent.cpp \
