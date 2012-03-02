@@ -40,7 +40,7 @@
 
 #include <QString>
 
-#define SERVICES_NUMBER 5
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 struct service_name {
     QString uuid;
@@ -59,7 +59,7 @@ static service_name services[] = {
 
 static QString getServiceName(const QString &uuid)
 {
-    for (int i = 0; i < SERVICES_NUMBER; i++)
+    for (unsigned i = 0; i < ARRAY_SIZE(services); i++)
         if (services[i].uuid == uuid)
             return services[i].name;
 
