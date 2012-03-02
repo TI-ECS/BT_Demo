@@ -251,6 +251,8 @@ void MainWindow::showDevice(QModelIndex index)
                 bt_hid->setEnabled(true);
             else if (str.toString() == "0000110b-0000-1000-8000-00805f9b34fb")
                 bt_a2dp->setEnabled(true);
+            else if (str.toString() == "0000110a-0000-1000-8000-00805f9b34fb")
+                bt_sink->setEnabled(true);
             else if (str.toString() == "00001101-0000-1000-8000-00805f9b34fb")
                 bt_spp->setEnabled(true);
         }
