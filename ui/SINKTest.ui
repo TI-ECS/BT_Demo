@@ -101,5 +101,25 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>bt_a2dp_sink_done</sender>
+   <signal>clicked()</signal>
+   <receiver>SINKTest</receiver>
+   <slot>done()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>199</x>
+     <y>175</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>done()</slot>
+ </slots>
 </ui>

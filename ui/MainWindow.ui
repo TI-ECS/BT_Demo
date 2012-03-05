@@ -322,6 +322,7 @@ Pairing remote device...</string>
    <header>SINKTest.h</header>
    <container>1</container>
    <slots>
+    <signal>testFinished()</signal>
     <signal>deviceReady(bool)</signal>
    </slots>
   </customwidget>
@@ -655,6 +656,22 @@ Pairing remote device...</string>
    <signal>deviceReady(bool)</signal>
    <receiver>MainWindow</receiver>
    <slot>readyToTest(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>178</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>248</x>
+     <y>167</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>a2dp_sink</sender>
+   <signal>testFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showMainPage()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>248</x>

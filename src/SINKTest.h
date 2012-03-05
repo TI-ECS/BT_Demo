@@ -61,6 +61,7 @@ public slots:
 private slots:
 
     void connectResult(QDBusPendingCallWatcher *watcher);
+    void done();
 
 signals:
 

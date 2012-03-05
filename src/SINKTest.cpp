@@ -67,6 +67,16 @@ void SINKTest::initTest(DeviceItem *device)
             this, SLOT(connectResult(QDBusPendingCallWatcher*)));
 }
 
+void SINKTest::done()
+{
+    audioSource->Disconnect();
+
+    delete audioSource;
+    audioSource = NULL;
+
+    emit testFinished();
+}
+
 void SINKTest::connectResult(QDBusPendingCallWatcher *watcher)
 {
     watcher->deleteLater();
