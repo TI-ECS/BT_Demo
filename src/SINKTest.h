@@ -61,6 +61,7 @@ public slots:
 private slots:
 
     void connectResult(QDBusPendingCallWatcher *watcher);
+    void paModuleLoadResult(int, QProcess::ExitStatus);
     void done();
 
 signals:
@@ -70,6 +71,8 @@ signals:
 
 private:
 
+    QProcess m_pactl;
+    QString m_sourceAddr;
     org::bluez::AudioSource *audioSource;
 };
 

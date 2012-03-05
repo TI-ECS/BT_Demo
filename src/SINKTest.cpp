@@ -47,6 +47,9 @@ SINKTest::SINKTest(QWidget *parent)
     :QWidget(parent)
 {
     setupUi(this);
+
+    m_pactl.closeReadChannel(QProcess::StandardOutput);
+    m_pactl.closeWriteChannel();
 }
 
 SINKTest::~SINKTest()
@@ -60,6 +63,8 @@ void SINKTest::initTest(DeviceItem *device)
     audioSource = new AudioSource(BLUEZ_SERVICE_NAME,
                                   device->device()->path(),
                                   QDBusConnection::systemBus());
+
+    m_sourceAddr = QString("%1").arg(device->address().replace(':', '_'));
 
     QDBusPendingCallWatcher *watcher;
     watcher = new QDBusPendingCallWatcher(audioSource->Connect(), this);
@@ -77,6 +82,18 @@ void SINKTest::done()
     emit testFinished();
 }
 
+void SINKTest::paModuleLoadResult(int exitCode, QProcess::ExitStatus)
+{
+    if (exitCode != 0) {
+        delete audioSource;
+        audioSource = NULL;
+        emit deviceReady(false);
+        return;
+    }
+
+    emit deviceReady(true);
+}
+
 void SINKTest::connectResult(QDBusPendingCallWatcher *watcher)
 {
     watcher->deleteLater();
@@ -89,5 +106,14 @@ void SINKTest::connectResult(QDBusPendingCallWatcher *watcher)
         return;
     }
 
-    emit deviceReady(true);
+    QStringList args;
+    args << "load-module" << "module-loopback"
+         << QString("source=bluez_source.%1").arg(m_sourceAddr)
+         << "sink=usbaudio";
+    m_pactl.start("/usr/bin/pactl", args);
+    if (!m_pactl.waitForStarted(10000))
+        close();
+
+    connect(&m_pactl, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+                SLOT(paModuleLoadResult(int, QProcess::ExitStatus)));
 }
