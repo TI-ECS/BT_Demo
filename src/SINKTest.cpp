@@ -42,6 +42,7 @@
 
 using namespace org::bluez;
 
+static QString BLUEZ_ALREADY_CONNECTED = "org.bluez.Error.AlreadyConnected";
 
 SINKTest::SINKTest(QWidget *parent)
     :QWidget(parent)
@@ -99,7 +100,13 @@ void SINKTest::connectResult(QDBusPendingCallWatcher *watcher)
     watcher->deleteLater();
 
     QDBusPendingReply<> reply = *watcher;
-    if (!reply.isValid() && reply.isError()) {
+    if (!reply.isValid()) {
+        if (reply.isError()
+            && reply.error().name() == BLUEZ_ALREADY_CONNECTED) {
+            emit deviceReady(true);
+            return;
+        }
+
         delete audioSource;
         audioSource = NULL;
         emit deviceReady(false);
