@@ -4,6 +4,11 @@ Makefile
 Makefile.Release
 Makefile.Debug
 
+*~
+.*.swp
+cscope.out
+tag
+
 #qt_noise
 mocs/*
 objects/*
