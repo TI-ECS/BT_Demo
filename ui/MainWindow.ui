@@ -321,6 +321,9 @@ Pairing remote device...</string>
    <extends>QWidget</extends>
    <header>SINKTest.h</header>
    <container>1</container>
+   <slots>
+    <signal>deviceReady(bool)</signal>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources>
@@ -644,6 +647,22 @@ Pairing remote device...</string>
     <hint type="destinationlabel">
      <x>7</x>
      <y>181</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>a2dp_sink</sender>
+   <signal>deviceReady(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>readyToTest(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>178</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>248</x>
+     <y>167</y>
     </hint>
    </hints>
   </connection>

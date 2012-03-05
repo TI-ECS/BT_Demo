@@ -40,7 +40,7 @@
 #define _SINKTEST_H_
 
 #include "DeviceItem.h"
-#include "audiosink.h"
+#include "audiosource.h"
 #include "ui_SINKTest.h"
 
 #include <QWidget>
@@ -59,13 +59,17 @@ public slots:
     void initTest(DeviceItem *device);
 
 private slots:
+
+    void connectResult(QDBusPendingCallWatcher *watcher);
+
 signals:
 
     void deviceReady(bool);
     void testFinished();
 
 private:
-     DeviceItem *device;
+
+    org::bluez::AudioSource *audioSource;
 };
 
 #endif /* _SINKTEST_H_ */

@@ -46,18 +46,38 @@ using namespace org::bluez;
 SINKTest::SINKTest(QWidget *parent)
     :QWidget(parent)
 {
-
     setupUi(this);
-
-    device = NULL;
 }
 
 SINKTest::~SINKTest()
 {
+    if (audioSource)
+        delete audioSource;
 }
 
 void SINKTest::initTest(DeviceItem *device)
 {
-    this->device = device;
+    audioSource = new AudioSource(BLUEZ_SERVICE_NAME,
+                                  device->device()->path(),
+                                  QDBusConnection::systemBus());
+
+    QDBusPendingCallWatcher *watcher;
+    watcher = new QDBusPendingCallWatcher(audioSource->Connect(), this);
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(connectResult(QDBusPendingCallWatcher*)));
 }
 
+void SINKTest::connectResult(QDBusPendingCallWatcher *watcher)
+{
+    watcher->deleteLater();
+
+    QDBusPendingReply<> reply = *watcher;
+    if (!reply.isValid() && reply.isError()) {
+        delete audioSource;
+        audioSource = NULL;
+        emit deviceReady(false);
+        return;
+    }
+
+    emit deviceReady(true);
+}

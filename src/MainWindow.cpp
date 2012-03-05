@@ -226,7 +226,15 @@ void MainWindow::scanDevices()
 
 void MainWindow::testSINK()
 {
-    // TODO: start the sink test
+    if (!currentDeviceItem) {
+        showMainPage();
+        return;
+    }
+
+    loading.start("Connecting");
+
+    a2dp_sink->initTest(currentDeviceItem);
+    currentTestPage = page_a2dp_sink;
 }
 
 void MainWindow::showDevice(QModelIndex index)
