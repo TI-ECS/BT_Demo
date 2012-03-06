@@ -73,7 +73,7 @@ private:
 
     QProcess m_pactl;
     QString m_sourceAddr;
-    org::bluez::AudioSource *audioSource;
+    org::bluez::AudioSource *m_audioSource;
 };
 
 #endif /* _SINKTEST_H_ */

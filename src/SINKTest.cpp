@@ -55,30 +55,30 @@ SINKTest::SINKTest(QWidget *parent)
 
 SINKTest::~SINKTest()
 {
-    if (audioSource)
-        delete audioSource;
+    if (m_audioSource)
+        delete m_audioSource;
 }
 
 void SINKTest::initTest(DeviceItem *device)
 {
-    audioSource = new AudioSource(BLUEZ_SERVICE_NAME,
-                                  device->device()->path(),
-                                  QDBusConnection::systemBus());
+    m_audioSource = new AudioSource(BLUEZ_SERVICE_NAME,
+                                    device->device()->path(),
+                                    QDBusConnection::systemBus());
 
     m_sourceAddr = QString("%1").arg(device->address().replace(':', '_'));
 
     QDBusPendingCallWatcher *watcher;
-    watcher = new QDBusPendingCallWatcher(audioSource->Connect(), this);
+    watcher = new QDBusPendingCallWatcher(m_audioSource->Connect(), this);
     connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
             this, SLOT(connectResult(QDBusPendingCallWatcher*)));
 }
 
 void SINKTest::done()
 {
-    audioSource->Disconnect();
+    m_audioSource->Disconnect();
 
-    delete audioSource;
-    audioSource = NULL;
+    delete m_audioSource;
+    m_audioSource = NULL;
 
     emit testFinished();
 }
@@ -86,8 +86,8 @@ void SINKTest::done()
 void SINKTest::paModuleLoadResult(int exitCode, QProcess::ExitStatus)
 {
     if (exitCode != 0) {
-        delete audioSource;
-        audioSource = NULL;
+        delete m_audioSource;
+        m_audioSource = NULL;
         emit deviceReady(false);
         return;
     }
@@ -107,8 +107,8 @@ void SINKTest::connectResult(QDBusPendingCallWatcher *watcher)
             return;
         }
 
-        delete audioSource;
-        audioSource = NULL;
+        delete m_audioSource;
+        m_audioSource = NULL;
         emit deviceReady(false);
         return;
     }
