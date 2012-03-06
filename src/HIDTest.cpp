@@ -104,9 +104,11 @@ void HIDTest::done()
 
     qputenv(MOUSE_VAR, defaultMouse.toAscii());
 
+#ifndef DEBUG
     QWSServer * server = QWSServer::instance();
     if (server)
         server->openMouse();
+#endif
 
     emit testFinished();
 }
@@ -134,9 +136,11 @@ void HIDTest::connectResult(QDBusPendingCallWatcher *watcher)
         }
 
         qputenv(MOUSE_VAR, value);
+#ifndef DEBUG
         QWSServer * server = QWSServer::instance();
         if (server)
             server->openMouse();
+#endif
     }
 
     emit deviceReady(true);
