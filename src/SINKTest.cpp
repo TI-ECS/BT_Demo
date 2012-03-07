@@ -95,12 +95,12 @@ void SINKTest::initLoadLoopback()
          << QString("source=bluez_source.%1").arg(m_sourceAddr)
          << "sink=audioout";
 
+    connect(&m_pactl, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+                SLOT(initLoadLoopbackResult(int, QProcess::ExitStatus)));
+
     m_pactl.start("/usr/bin/pactl", args);
     if (!m_pactl.waitForStarted(10000))
         close();
-
-    connect(&m_pactl, SIGNAL(finished(int, QProcess::ExitStatus)), this,
-                SLOT(initLoadLoopbackResult(int, QProcess::ExitStatus)));
 }
 
 void SINKTest::initConnectRemoteResult(QDBusPendingCallWatcher *watcher)
