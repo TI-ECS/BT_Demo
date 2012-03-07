@@ -55,6 +55,15 @@ SINKTest::SINKTest(QWidget *parent)
 
     m_pulse.closeReadChannel(QProcess::StandardOutput);
     m_pulse.closeWriteChannel();
+
+    // Parse command line
+    QString s = "--alsa-device=";
+    foreach (QString arg, QApplication::arguments()) {
+        if (!arg.startsWith(s))
+            continue;
+
+        m_alsaSink = arg.section('=', 1, 1).toInt();
+    }
 }
 
 SINKTest::~SINKTest()
