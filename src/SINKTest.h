@@ -73,6 +73,7 @@ private slots:
 
     void setVolume(int);
     void propertyChanged(const QString&, const QDBusVariant&);
+
 signals:
 
     void deviceReady(bool);

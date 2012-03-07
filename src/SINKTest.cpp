@@ -108,9 +108,11 @@ void SINKTest::initConnectRemoteResult(QDBusPendingCallWatcher *watcher)
     watcher->deleteLater();
 
     QDBusPendingReply<> reply = *watcher;
-    if (!reply.isValid()) {
-        emit deviceReady(false);
-        return;
+    if (!reply.isValid() && (!reply.isError()
+                             || reply.error().name() !=
+                                BLUEZ_ALREADY_CONNECTED)) {
+            emit deviceReady(false);
+            return;
     }
 
     initLoadLoopback();
@@ -151,9 +153,9 @@ void SINKTest::initTest(DeviceItem *device)
 
     m_sourceAddr = device->address().replace(':', '_');
 
-    connect(m_audioSource, SIGNAL(PropertyChanged(const String&,
+    connect(m_audioSource, SIGNAL(PropertyChanged(const QString&,
                                                   const QDBusVariant&)),
-            this, SLOT(propertyChanged(const String&,
+            this, SLOT(propertyChanged(const QString&,
                                        const QDBusVariant&)));
 
     // Finish previous instance of pulseaudio
@@ -190,7 +192,7 @@ void SINKTest::done()
 }
 
 void SINKTest::propertyChanged(const QString &property,
-                                 const QDBusVariant &value)
+                               const QDBusVariant &value)
 {
     if (property != QString("State"))
         return;
