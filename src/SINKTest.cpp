@@ -46,6 +46,7 @@ static QString BLUEZ_ALREADY_CONNECTED = "org.bluez.Error.AlreadyConnected";
 
 SINKTest::SINKTest(QWidget *parent)
     :QWidget(parent),
+    m_connected(false),
     m_alsaSink(0)
 {
     setupUi(this);
@@ -148,6 +149,11 @@ void SINKTest::initTest(DeviceItem *device)
 
     m_sourceAddr = device->address().replace(':', '_');
 
+    connect(m_audioSource, SIGNAL(PropertyChanged(const String&,
+                                                  const QDBusVariant&)),
+            this, SLOT(propertyChanged(const String&,
+                                       cont QDBusVariant&)));
+
     // Finish previous instance of pulseaudio
     shutdownPulse();
 
@@ -174,8 +180,24 @@ void SINKTest::shutdown()
 
 void SINKTest::done()
 {
-    m_audioSource->Disconnect();
-    shutdown();
+    if (m_connected)
+        m_audioSource->Disconnect();
 
+    shutdown();
     emit testFinished();
+}
+
+void SINKTest::propertyChanged(const QString &property,
+                                 const QDBusVariant &value)
+{
+    if (property != QString("State"))
+        return;
+
+    QString v = value.variant().toString();
+    label_status->setText(v);
+
+    if (v == QString("disconnected"))
+        m_connected = false;
+    else
+        m_connected = true;
 }

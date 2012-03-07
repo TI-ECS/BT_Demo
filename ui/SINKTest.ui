@@ -54,7 +54,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string/>
+        <string>connected</string>
        </property>
       </widget>
      </item>

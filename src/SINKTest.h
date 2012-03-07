@@ -71,6 +71,7 @@ private slots:
     void initConnectRemote();
     void initStartPulse();
 
+    void propertyChanged(const QString&, const QDBusVariant&);
 signals:
 
     void deviceReady(bool);
@@ -78,6 +79,7 @@ signals:
 
 private:
 
+    bool m_connected;
     unsigned m_alsaSink;
     QProcess m_pulse;
     QProcess m_pactl;
