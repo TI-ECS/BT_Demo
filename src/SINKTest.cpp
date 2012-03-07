@@ -89,6 +89,9 @@ void SINKTest::initLoadLoopback()
 {
     QStringList args;
 
+    if (m_pactl.state() != QProcess::NotRunning)
+        return;
+
     setVolume(hslider_volume->value());
 
     args << "load-module" << "module-loopback"
@@ -202,8 +205,10 @@ void SINKTest::propertyChanged(const QString &property,
 
     if (v == QString("disconnected"))
         m_connected = false;
-    else
+    else if (v == QString("connected") || v == QString("playing")) {
         m_connected = true;
+        initLoadLoopback();
+    }
 }
 
 void SINKTest::setVolume(int val)
