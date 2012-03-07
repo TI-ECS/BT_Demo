@@ -89,6 +89,8 @@ void SINKTest::initLoadLoopback()
 {
     QStringList args;
 
+    setVolume(hslider_volume->value());
+
     args << "load-module" << "module-loopback"
          << QString("source=bluez_source.%1").arg(m_sourceAddr)
          << "sink=audioout";
@@ -152,7 +154,7 @@ void SINKTest::initTest(DeviceItem *device)
     connect(m_audioSource, SIGNAL(PropertyChanged(const String&,
                                                   const QDBusVariant&)),
             this, SLOT(propertyChanged(const String&,
-                                       cont QDBusVariant&)));
+                                       const QDBusVariant&)));
 
     // Finish previous instance of pulseaudio
     shutdownPulse();
@@ -200,4 +202,18 @@ void SINKTest::propertyChanged(const QString &property,
         m_connected = false;
     else
         m_connected = true;
+}
+
+void SINKTest::setVolume(int val)
+{
+    QProcess k;
+    QStringList args;
+
+    args << "set-sink-volume" << "audioout"
+         << QString::number(val).append("%");
+
+    k.closeWriteChannel();
+    k.start("/usr/bin/pactl", args);
+    if (!k.waitForFinished(10000))
+        close();
 }

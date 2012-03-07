@@ -71,6 +71,12 @@
      </item>
      <item>
       <widget class="QSlider" name="hslider_volume">
+       <property name="value">
+        <number>80</number>
+       </property>
+       <property name="tracking">
+        <bool>false</bool>
+       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -118,8 +124,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>hslider_volume</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>SINKTest</receiver>
+   <slot>setVolume(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>145</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>done()</slot>
+  <slot>setVolume(int)</slot>
  </slots>
 </ui>

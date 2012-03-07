@@ -71,6 +71,7 @@ private slots:
     void initConnectRemote();
     void initStartPulse();
 
+    void setVolume(int);
     void propertyChanged(const QString&, const QDBusVariant&);
 signals:
 
