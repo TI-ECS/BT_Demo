@@ -45,18 +45,90 @@ using namespace org::bluez;
 static QString BLUEZ_ALREADY_CONNECTED = "org.bluez.Error.AlreadyConnected";
 
 SINKTest::SINKTest(QWidget *parent)
-    :QWidget(parent)
+    :QWidget(parent),
+    m_alsaSink(0)
 {
     setupUi(this);
 
     m_pactl.closeReadChannel(QProcess::StandardOutput);
     m_pactl.closeWriteChannel();
+
+    m_pulse.closeReadChannel(QProcess::StandardOutput);
+    m_pulse.closeWriteChannel();
 }
 
 SINKTest::~SINKTest()
 {
-    if (m_audioSource)
-        delete m_audioSource;
+    shutdown();
+}
+
+void SINKTest::initLoadLoopbackResult(int exitCode, QProcess::ExitStatus)
+{
+    disconnect(&m_pactl, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+               SLOT(initLoadLoopbackResult(int, QProcess::ExitStatus)));
+
+    if (exitCode != 0) {
+        emit deviceReady(false);
+        return;
+    }
+
+    emit deviceReady(true);
+}
+
+void SINKTest::initLoadLoopback()
+{
+    QStringList args;
+
+    args << "load-module" << "module-loopback"
+         << QString("source=bluez_source.%1").arg(m_sourceAddr)
+         << "sink=audioout";
+
+    m_pactl.start("/usr/bin/pactl", args);
+    if (!m_pactl.waitForStarted(10000))
+        close();
+
+    connect(&m_pactl, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+                SLOT(initLoadLoopbackResult(int, QProcess::ExitStatus)));
+}
+
+void SINKTest::initConnectRemoteResult(QDBusPendingCallWatcher *watcher)
+{
+    watcher->deleteLater();
+
+    QDBusPendingReply<> reply = *watcher;
+    if (!reply.isValid()) {
+        emit deviceReady(false);
+        return;
+    }
+
+    initLoadLoopback();
+}
+
+void SINKTest::initConnectRemote()
+{
+    QDBusPendingCallWatcher *watcher =
+                new QDBusPendingCallWatcher(m_audioSource->Connect(), this);
+
+    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
+            this, SLOT(initConnectRemoteResult(QDBusPendingCallWatcher*)));
+}
+
+void SINKTest::initStartPulse()
+{
+    QStringList args;
+
+    args << "-n" << "-D" << "--realtime" << "--disallow-exit"
+         << "--high-priority" << "--exit-idle-time=-1"
+         << "--resample-method=trivial" << "--fail"
+         << "-L" << "module-native-protocol-unix"
+         << "-L" << "module-bluetooth-discover"
+         << "-L" << QString("module-alsa-sink device=\"hw:%1,0\" sink_name=audioout").arg(m_alsaSink);
+
+    m_pulse.start("/usr/bin/pulseaudio", args);
+    if (!m_pulse.waitForStarted(10000))
+        close();
+
+    initConnectRemote();
 }
 
 void SINKTest::initTest(DeviceItem *device)
@@ -65,62 +137,36 @@ void SINKTest::initTest(DeviceItem *device)
                                     device->device()->path(),
                                     QDBusConnection::systemBus());
 
-    m_sourceAddr = QString("%1").arg(device->address().replace(':', '_'));
+    m_sourceAddr = device->address().replace(':', '_');
 
-    QDBusPendingCallWatcher *watcher;
-    watcher = new QDBusPendingCallWatcher(m_audioSource->Connect(), this);
-    connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
-            this, SLOT(connectResult(QDBusPendingCallWatcher*)));
+    // Finish previous instance of pulseaudio
+    shutdownPulse();
+
+    initStartPulse();
+}
+
+void SINKTest::shutdownPulse()
+{
+    QProcess k;
+
+    k.closeWriteChannel();
+    k.start("/usr/bin/pulseaudio", QStringList() << "--kill");
+    if (!k.waitForFinished(10000))
+        close();
+}
+
+void SINKTest::shutdown()
+{
+    shutdownPulse();
+
+    delete m_audioSource;
+    m_audioSource = NULL;
 }
 
 void SINKTest::done()
 {
     m_audioSource->Disconnect();
-
-    delete m_audioSource;
-    m_audioSource = NULL;
+    shutdown();
 
     emit testFinished();
-}
-
-void SINKTest::paModuleLoadResult(int exitCode, QProcess::ExitStatus)
-{
-    if (exitCode != 0) {
-        delete m_audioSource;
-        m_audioSource = NULL;
-        emit deviceReady(false);
-        return;
-    }
-
-    emit deviceReady(true);
-}
-
-void SINKTest::connectResult(QDBusPendingCallWatcher *watcher)
-{
-    watcher->deleteLater();
-
-    QDBusPendingReply<> reply = *watcher;
-    if (!reply.isValid()) {
-        if (reply.isError()
-            && reply.error().name() == BLUEZ_ALREADY_CONNECTED) {
-            emit deviceReady(true);
-            return;
-        }
-
-        delete m_audioSource;
-        m_audioSource = NULL;
-        emit deviceReady(false);
-        return;
-    }
-
-    QStringList args;
-    args << "load-module" << "module-loopback"
-         << QString("source=bluez_source.%1").arg(m_sourceAddr)
-         << "sink=usbaudio";
-    m_pactl.start("/usr/bin/pactl", args);
-    if (!m_pactl.waitForStarted(10000))
-        close();
-
-    connect(&m_pactl, SIGNAL(finished(int, QProcess::ExitStatus)), this,
-                SLOT(paModuleLoadResult(int, QProcess::ExitStatus)));
 }

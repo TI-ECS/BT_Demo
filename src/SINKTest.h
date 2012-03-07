@@ -60,9 +60,16 @@ public slots:
 
 private slots:
 
-    void connectResult(QDBusPendingCallWatcher *watcher);
-    void paModuleLoadResult(int, QProcess::ExitStatus);
     void done();
+
+    void shutdownPulse();
+    void shutdown();
+
+    void initLoadLoopbackResult(int, QProcess::ExitStatus);
+    void initLoadLoopback();
+    void initConnectRemoteResult(QDBusPendingCallWatcher *watcher);
+    void initConnectRemote();
+    void initStartPulse();
 
 signals:
 
@@ -71,6 +78,8 @@ signals:
 
 private:
 
+    unsigned m_alsaSink;
+    QProcess m_pulse;
     QProcess m_pactl;
     QString m_sourceAddr;
     org::bluez::AudioSource *m_audioSource;
