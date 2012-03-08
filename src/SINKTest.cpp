@@ -47,7 +47,7 @@ static QString BLUEZ_ALREADY_CONNECTED = "org.bluez.Error.AlreadyConnected";
 SINKTest::SINKTest(QWidget *parent)
     :QWidget(parent),
     m_connected(false),
-    m_alsaSink(0)
+    m_alsaSink(1)
 {
     setupUi(this);
 
