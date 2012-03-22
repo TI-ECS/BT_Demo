@@ -217,7 +217,9 @@ void SINKTest::setVolume(int val)
     QStringList args;
 
     args << "set-sink-volume" << "audioout"
-         << QString::number(val).append("%");
+         << QString::number((unsigned)((val/100.) * 65535));
+
+    qDebug() << args;
 
     k.closeWriteChannel();
     k.start("/usr/bin/pactl", args);
