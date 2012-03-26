@@ -36,6 +36,8 @@
 *
 */
 
+#include <QMessageBox>
+
 #include "SINKTest.h"
 #include "types.h"
 
@@ -102,8 +104,10 @@ void SINKTest::initLoadLoopback()
                 SLOT(initLoadLoopbackResult(int, QProcess::ExitStatus)));
 
     m_pactl.start("/usr/bin/pactl", args);
-    if (!m_pactl.waitForStarted(10000))
-        close();
+    if (!m_pactl.waitForStarted(10000)) {
+        QMessageBox::critical(this, "pulseaudio", "Could not load loopback module");
+        emit deviceReady(false);
+    }
 }
 
 void SINKTest::initConnectRemoteResult(QDBusPendingCallWatcher *watcher)
@@ -142,8 +146,10 @@ void SINKTest::initStartPulse()
          << "-L" << QString("module-alsa-sink device=\"hw:%1,0\" sink_name=audioout").arg(m_alsaSink);
 
     m_pulse.start("/usr/bin/pulseaudio", args);
-    if (!m_pulse.waitForStarted(10000))
-        close();
+    if (!m_pulse.waitForStarted(10000)) {
+        QMessageBox::critical(this, "pulseaudio", "Could not run pulseaudio-server");
+        emit deviceReady(false);
+    }
 
     initConnectRemote();
 }
