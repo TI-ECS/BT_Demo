@@ -121,8 +121,8 @@ void SINKTest::initConnectRemoteResult(QDBusPendingCallWatcher *watcher)
             emit deviceReady(false);
             return;
     }
-
-    initLoadLoopback();
+    // Loopback will be loaded async, when property changed to "connected"
+    // or "playing"
 }
 
 void SINKTest::initConnectRemote()
@@ -211,7 +211,8 @@ void SINKTest::propertyChanged(const QString &property,
 
     if (v == QString("disconnected"))
         m_connected = false;
-    else if (v == QString("connected") || v == QString("playing")) {
+    else if (!m_connected &&
+            (v == QString("connected") || v == QString("playing"))) {
         m_connected = true;
         initLoadLoopback();
     }
