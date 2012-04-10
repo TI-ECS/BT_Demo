@@ -80,9 +80,11 @@ signals:
     void testFinished();
 
 private:
+    bool loadAlsaCards();
 
     bool m_connected;
     unsigned m_alsaSink;
+    QHash<int, QString> m_cards;
     QProcess m_pulse;
     QProcess m_pactl;
     QString m_sourceAddr;

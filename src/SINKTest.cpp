@@ -37,11 +37,13 @@
 */
 
 #include <QMessageBox>
+#include <QTextStream>
 
 #include "SINKTest.h"
 #include "types.h"
 
 
+#define ALSA_CARDS_PROC_FILE "/proc/asound/cards"
 using namespace org::bluez;
 
 static QString BLUEZ_ALREADY_CONNECTED = "org.bluez.Error.AlreadyConnected";
@@ -67,6 +69,38 @@ SINKTest::SINKTest(QWidget *parent)
 
         m_alsaSink = arg.section('=', 1, 1).toInt();
     }
+}
+
+bool SINKTest::loadAlsaCards()
+{
+    m_cards.clear();
+
+    QFile file(ALSA_CARDS_PROC_FILE);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "Could not load list of alsa cards";
+        return false;
+    }
+
+    QTextStream t(&file);
+    for (;;) {
+        QString line = t.readLine();
+        if (line == NULL)
+            break;
+
+        QString idx(line.left(2));
+        QString shortname(line.section('-', -1, -1).trimmed());
+
+        // discard useless line, but check for error
+        if (t.readLine() == NULL) {
+            qDebug() << "Unexpected end of file";
+            return false;
+        }
+
+        qDebug() << "idx:" << idx.toInt() << " shortname:" << shortname;
+        m_cards.insert(idx.toInt(), shortname);
+    }
+
+    return true;
 }
 
 SINKTest::~SINKTest()
@@ -170,6 +204,7 @@ void SINKTest::initTest(DeviceItem *device)
     // Finish previous instance of pulseaudio
     shutdownPulse();
 
+    loadAlsaCards();
     initStartPulse();
 }
 
