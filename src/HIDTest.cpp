@@ -39,6 +39,7 @@
 #include "HIDTest.h"
 
 #include <QWSServer>
+#include <unistd.h>
 
 #define MOUSE_VAR "QWS_MOUSE_PROTO"
 
