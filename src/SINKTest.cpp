@@ -259,8 +259,10 @@ void SINKTest::shutdown()
 
 void SINKTest::done()
 {
-    if (m_connected)
+    if (m_connected) {
         m_audioSource->Disconnect();
+        m_connected = false;
+    }
 
     shutdown();
     emit testFinished();
