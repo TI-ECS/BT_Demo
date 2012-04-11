@@ -51,7 +51,7 @@ static QString BLUEZ_ALREADY_CONNECTED = "org.bluez.Error.AlreadyConnected";
 SINKTest::SINKTest(QWidget *parent)
     :QWidget(parent),
     m_connected(false),
-    m_alsaSink(1)
+    m_alsaSink(0)
 {
     setupUi(this);
 
@@ -62,12 +62,14 @@ SINKTest::SINKTest(QWidget *parent)
     m_pulse.closeWriteChannel();
 
     // Parse command line
-    QString s = "--alsa-device=";
+    QString blacklistarg = "--blacklist-alsa-cards=";
     foreach (QString arg, QApplication::arguments()) {
-        if (!arg.startsWith(s))
+        if (!arg.startsWith(blacklistarg))
             continue;
 
-        m_alsaSink = arg.section('=', 1, 1).toInt();
+        QStringList l = arg.remove(0, blacklistarg.length()).split(',', QString::SkipEmptyParts);
+        foreach(const QString &s, l)
+            m_blacklist.insert(s);
     }
 }
 
@@ -96,8 +98,12 @@ bool SINKTest::loadAlsaCards()
             return false;
         }
 
-        qDebug() << "idx:" << idx.toInt() << " shortname:" << shortname;
-        combo_cards->addItem(shortname, idx.toInt());
+        bool blacklisted = m_blacklist.contains(shortname);
+        qDebug() << "idx:" << idx.toInt() << " shortname:" << shortname
+                 << "blacklisted?" << blacklisted;
+
+        if (!blacklisted)
+            combo_cards->addItem(shortname, idx.toInt());
     }
 
     if (combo_cards->count() > 0)

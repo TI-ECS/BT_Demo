@@ -84,6 +84,7 @@ signals:
 private:
     bool loadAlsaCards();
 
+    QSet<QString> m_blacklist;
     bool m_connected;
     unsigned m_alsaSink;
     QProcess m_pulse;
