@@ -231,10 +231,10 @@ void MainWindow::testSINK()
         return;
     }
 
-    loading.start("Connecting");
-
-    a2dp_sink->initTest(currentDeviceItem);
-    currentTestPage = page_a2dp_sink;
+    if (a2dp_sink->initTest(currentDeviceItem)) {
+        currentTestPage = page_a2dp_sink;
+        stackedWidget->setCurrentWidget(currentTestPage);
+    }
 }
 
 void MainWindow::showDevice(QModelIndex index)
@@ -431,6 +431,11 @@ void MainWindow::readyToTest(bool ready)
         stackedWidget->setCurrentWidget(currentTestPage);
     else
         stackedWidget->setCurrentWidget(page_main);
+}
+
+void MainWindow::loadingLaterStart()
+{
+    loading.start("Connecting");
 }
 
 void MainWindow::startFinished(int exitCode, QProcess::ExitStatus exitStatus)

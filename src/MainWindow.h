@@ -72,6 +72,7 @@ public:
 public slots:
     virtual void showFullScreen();
     void readyToTest(bool);
+    void loadingLaterStart();
     void showMainPage();
 
 private slots:

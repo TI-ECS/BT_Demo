@@ -56,7 +56,8 @@ public:
 
 public slots:
 
-    void initTest(DeviceItem *device);
+    bool initTest(DeviceItem *device);
+    void initTest();
 
 private slots:
 
@@ -78,13 +79,13 @@ signals:
 
     void deviceReady(bool);
     void testFinished();
+    void connectingStarted();
 
 private:
     bool loadAlsaCards();
 
     bool m_connected;
     unsigned m_alsaSink;
-    QHash<int, QString> m_cards;
     QProcess m_pulse;
     QProcess m_pactl;
     QString m_sourceAddr;

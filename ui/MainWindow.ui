@@ -47,7 +47,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>7</number>
      </property>
      <widget class="QWidget" name="page_main">
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -324,6 +324,7 @@ Pairing remote device...</string>
    <slots>
     <signal>testFinished()</signal>
     <signal>deviceReady(bool)</signal>
+    <signal>connectingStarted()</signal>
    </slots>
   </customwidget>
  </customwidgets>
@@ -620,22 +621,6 @@ Pairing remote device...</string>
    </hints>
   </connection>
   <connection>
-   <sender>bt_opp</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>testOPP()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>378</x>
-     <y>98</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>539</x>
-     <y>168</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>bt_sink</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
@@ -683,6 +668,22 @@ Pairing remote device...</string>
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>a2dp_sink</sender>
+   <signal>connectingStarted()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loadingLaterStart()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>58</x>
+     <y>45</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>248</x>
+     <y>167</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>quit()</slot>
@@ -709,5 +710,6 @@ Pairing remote device...</string>
   <slot>trustDevice()</slot>
   <slot>readyToTest(bool)</slot>
   <slot>testSINK()</slot>
+  <slot>loadingLaterStart()</slot>
  </slots>
 </ui>

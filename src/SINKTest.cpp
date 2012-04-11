@@ -73,7 +73,7 @@ SINKTest::SINKTest(QWidget *parent)
 
 bool SINKTest::loadAlsaCards()
 {
-    m_cards.clear();
+    combo_cards->clear();
 
     QFile file(ALSA_CARDS_PROC_FILE);
     if (!file.open(QIODevice::ReadOnly)) {
@@ -97,8 +97,11 @@ bool SINKTest::loadAlsaCards()
         }
 
         qDebug() << "idx:" << idx.toInt() << " shortname:" << shortname;
-        m_cards.insert(idx.toInt(), shortname);
+        combo_cards->addItem(shortname, idx.toInt());
     }
+
+    if (combo_cards->count() > 0)
+        combo_cards->setCurrentIndex(0);
 
     return true;
 }
@@ -188,24 +191,46 @@ void SINKTest::initStartPulse()
     initConnectRemote();
 }
 
-void SINKTest::initTest(DeviceItem *device)
+void SINKTest::initTest()
 {
-    m_audioSource = new AudioSource(BLUEZ_SERVICE_NAME,
-                                    device->device()->path(),
-                                    QDBusConnection::systemBus());
-
-    m_sourceAddr = device->address().replace(':', '_');
-
+    emit connectingStarted();
     connect(m_audioSource, SIGNAL(PropertyChanged(const QString&,
                                                   const QDBusVariant&)),
             this, SLOT(propertyChanged(const QString&,
                                        const QDBusVariant&)));
+    stackedWidget->setCurrentWidget(page_init_test);
+    m_alsaSink = combo_cards->itemData(combo_cards->currentIndex()).toInt();
+    initStartPulse();
+}
+
+bool SINKTest::initTest(DeviceItem *device)
+{
+    m_audioSource = new AudioSource(BLUEZ_SERVICE_NAME,
+                                    device->device()->path(),
+                                    QDBusConnection::systemBus());
+    m_sourceAddr = device->address().replace(':', '_');
+
+    if (!loadAlsaCards()) {
+        QMessageBox::critical(this, "alsa", "Could not list sound cards");
+        emit deviceReady(false);
+        return false;
+    }
+
+    if (combo_cards->count() == 0) {
+        QMessageBox::critical(this, "alsa", "Could not find any sound card");
+        emit deviceReady(false);
+        return false;
+    }
 
     // Finish previous instance of pulseaudio
     shutdownPulse();
 
-    loadAlsaCards();
-    initStartPulse();
+    if (combo_cards->count() == 1)
+        initTest();
+    else
+        stackedWidget->setCurrentWidget(page_choose_card);
+
+    return true;
 }
 
 void SINKTest::shutdownPulse()
