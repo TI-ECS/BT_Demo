@@ -181,14 +181,14 @@ void SINKTest::initStartPulse()
 {
     QStringList args;
 
-    args << "-n" << "-D" << "--realtime" << "--disallow-exit"
+    args << "/usr/bin/pulseaudio" << "-n" << "--realtime" << "--disallow-exit"
          << "--high-priority" << "--exit-idle-time=-1"
          << "--resample-method=trivial" << "--fail"
          << "-L" << "module-native-protocol-unix"
          << "-L" << "module-bluetooth-discover"
          << "-L" << QString("module-alsa-sink device=\"hw:%1,0\" sink_name=audioout").arg(m_alsaSink);
 
-    m_pulse.start("/usr/bin/pulseaudio", args);
+    m_pulse.start("/usr/bin/dbus-launch", args);
     if (!m_pulse.waitForStarted(10000)) {
         QMessageBox::critical(this, "pulseaudio", "Could not run pulseaudio-server");
         emit deviceReady(false);
