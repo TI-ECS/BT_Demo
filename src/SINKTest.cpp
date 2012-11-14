@@ -114,7 +114,6 @@ bool SINKTest::loadAlsaCards()
 
 SINKTest::~SINKTest()
 {
-    shutdown();
 }
 
 void SINKTest::initLoadLoopbackResult(int exitCode, QProcess::ExitStatus)
@@ -211,9 +210,6 @@ void SINKTest::initTest()
 
 bool SINKTest::initTest(DeviceItem *device)
 {
-    m_audioSource = new AudioSource(BLUEZ_SERVICE_NAME,
-                                    device->device()->path(),
-                                    QDBusConnection::systemBus());
     m_sourceAddr = device->address().replace(':', '_');
 
     if (!loadAlsaCards()) {
@@ -227,6 +223,10 @@ bool SINKTest::initTest(DeviceItem *device)
         emit deviceReady(false);
         return false;
     }
+
+    m_audioSource = new AudioSource(BLUEZ_SERVICE_NAME,
+                                    device->device()->path(),
+                                    QDBusConnection::systemBus());
 
     // Finish previous instance of pulseaudio
     shutdownPulse();
@@ -254,7 +254,6 @@ void SINKTest::shutdown()
     shutdownPulse();
 
     delete m_audioSource;
-    m_audioSource = NULL;
 }
 
 void SINKTest::done()
